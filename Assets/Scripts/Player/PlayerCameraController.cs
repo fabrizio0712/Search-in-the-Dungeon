@@ -6,8 +6,8 @@ public class PlayerCameraController : MonoBehaviour
     [SerializeField] private Transform orientation;
     [SerializeField] private Transform cameraPosition;
 
-    private float xRotation;
-    private float yRotation;
+    private float xRotation = 0;
+    private float yRotation = 0;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -23,7 +23,7 @@ public class PlayerCameraController : MonoBehaviour
         float mouseY = Input.GetAxisRaw("Mouse Y") * Time.deltaTime * cameraSensitivity;
         yRotation += mouseX;
         xRotation -= mouseY;
-        xRotation = Mathf.Clamp(xRotation, -90f, 90f);
+        xRotation = Mathf.Clamp(xRotation, -80f, 80f);
         transform.rotation = Quaternion.Euler(xRotation, yRotation, 0);
         orientation.rotation = Quaternion.Euler(0, yRotation, 0);
         transform.position = cameraPosition.position;
