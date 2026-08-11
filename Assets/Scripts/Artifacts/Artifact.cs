@@ -26,7 +26,7 @@ public class Artifact : MonoBehaviour
     {
         if (other.CompareTag("Player")) 
         {
-            gameManager.ShowInteract(true);
+            gameManager.UIShowInteract(true);
             canInteract = true;
         }
     }
@@ -34,14 +34,14 @@ public class Artifact : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            gameManager.ShowInteract(false);
+            gameManager.UIShowInteract(false);
             canInteract = false;
         }
     }
     private void DeactivateArtifact() 
     {
         canInteract = false;
-        gameManager.ShowInteract(false);
+        gameManager.UIShowInteract(false);
         gameManager.PickUpArtifact();
         gameObject.SetActive(false);
     }
