@@ -21,6 +21,7 @@ public class FieldOfView : MonoBehaviour
 
     public bool HasVisualTarget { get => hasVisualTarget; }
     public Vector3 LastKnownPosition { get => lastKnownPosition; }
+    public List<Collider> VisibleTargets { get => visibleTargets; }
 
     private void Start()
     {
@@ -55,6 +56,7 @@ public class FieldOfView : MonoBehaviour
                         visibleTargets.Add(targetsInViewRadius[i]);
                     }
                     tempbool = true;
+                    lastKnownPosition = visibleTargets[0].transform.position;
                 }
             }
         }

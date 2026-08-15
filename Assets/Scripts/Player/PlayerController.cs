@@ -2,7 +2,7 @@ using Unity.Mathematics;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
-{
+{ 
     // Game Managers
     [SerializeField] private GameManager gameManager;
     [SerializeField] private PlayerUIManager playerUIManager;
