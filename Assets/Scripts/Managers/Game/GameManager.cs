@@ -62,8 +62,8 @@ public class GameManager : MonoBehaviour
         SpanwRandomArtifact();
 
         //---- Debug Show Block Updates -----
-        AddHazardBlock(3);
-        AddRiskBlock(5);
+        //AddHazardBlock(3);
+        //AddRiskBlock(5);
         UIHazardBlockUpdate();
         UIRiskBlockUpdate();
         //----------------------------------- 
@@ -105,6 +105,7 @@ public class GameManager : MonoBehaviour
     public void AddRiskBlock(int amount) 
     {
         riskBlockCount += amount;
+        UIRiskBlockUpdate();
     }
     public void RiskUpdate(int amount)
     {
@@ -142,6 +143,7 @@ public class GameManager : MonoBehaviour
     public void AddHazardBlock(int amount) 
     {
         hazardBlockCount += amount;
+        UIHazardBlockUpdate();
     }
     public void HazardUpdate(int amount)
     {
