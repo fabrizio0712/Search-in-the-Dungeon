@@ -7,6 +7,7 @@ public class Artifact : MonoBehaviour
     private bool canInteract = false;
 
     public GameManager GameManager { get => gameManager; set => gameManager = value; }
+    public SO_Artifact ArtifactInfo { get => artifactInfo; }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()

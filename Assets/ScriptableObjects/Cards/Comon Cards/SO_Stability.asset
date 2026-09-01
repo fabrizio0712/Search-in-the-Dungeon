@@ -12,10 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8fb45163e232027418c62cdeeb1e6ccd, type: 3}
   m_Name: SO_Stability
   m_EditorClassIdentifier: Assembly-CSharp::SO_Card
+  cardID: 2
   cardName: Stability
   cardDescription: Block 2 Hazard
   cardMaxCopies: 5
   cardRarity: 0
   cardImage: {fileID: 0}
   cardPrice: 8
-  cardDuration: 5
+  cardDuration: 6

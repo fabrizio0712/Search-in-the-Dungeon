@@ -14,7 +14,7 @@ public class RangeEnemy : MonoBehaviour
     // Attack Variables
     [SerializeField] private float attackCooldown;
     private float currentAttackTime = 0;
-
+    
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -28,8 +28,7 @@ public class RangeEnemy : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
-        if (fieldOfView.HasVisualTarget) 
+        if (fieldOfView.HasVisualTarget)
         {
             body.transform.forward = fieldOfView.GetTarget().bounds.center - body.transform.position;
             if (currentAttackTime < attackCooldown) currentAttackTime += Time.deltaTime;
@@ -39,7 +38,7 @@ public class RangeEnemy : MonoBehaviour
                 currentAttackTime = 0;
             }
         }
-        else 
+        else
         {
             currentAttackTime = 0;
             transform.RotateAroundLocal(Vector3.up, 5 * Time.deltaTime);

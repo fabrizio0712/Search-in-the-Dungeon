@@ -1,8 +1,9 @@
 using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.Assemblies;
 
 public class PlayerController : MonoBehaviour
-{ 
+{
     // Game Managers
     [SerializeField] private GameManager gameManager;
     [SerializeField] private PlayerUIManager playerUIManager;
@@ -23,10 +24,14 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float crouchMultiplier;
 
     private float speedMultiplier = 1;
-    private float buffSpeed = 1;
-    private float debuffSpeed = 1;
     private Vector3 moveDirection = Vector3.zero;
-    
+    private float debuffSpeed = 1;
+
+    // Movement Buff
+    private float buffSpeed = 1;
+    private bool hasBuffSpeed = false;
+    private float currentBuffSpeedDuration = 0;
+
     // Gravity Variables
     private float gravity = -32f;
     private float groundedGravity = -0.1f;
@@ -37,12 +42,16 @@ public class PlayerController : MonoBehaviour
     private float initialJumpVelocity = 8;
     private bool isJumping = false;
 
+    // Jump Buff
+    private float buffJump = 1;
+    private bool hasBuffJump = false;
+    private float currentBuffJumpDuration = 0;
+
     // Health Variables
     [SerializeField] private float maxHealth = 100;
     [SerializeField] private float currentHealth;
 
     public Transform BodyOrientation { get => bodyOrientation; }
-    public float BuffSpeed { get => buffSpeed; set => buffSpeed = value; }
     public float DebuffSpeed { get => debuffSpeed; set => debuffSpeed = value; }
 
     // -------- Variables De Debug ----------
@@ -61,6 +70,8 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         InputUpdate();
+        HandleSpeedBuff();
+        HandleJumpBuff();
         HandleSoundEmition();
         HandleHeight();
         HandleJump();
@@ -79,26 +90,47 @@ public class PlayerController : MonoBehaviour
         if (transform.position.y >= 1 && characterController.velocity.y > 0) Debug.Log("El salto alcanzó la siguiente altura: " + transform.position.y);
         // ------------------------------------------------ */
     }
-    private void InputUpdate() 
+    private void InputUpdate()
     {
         inputHorizontal = Input.GetAxisRaw("Horizontal");
         inputVertical = Input.GetAxisRaw("Vertical");
         inputJump = Input.GetButton("Jump");
         inputCrouch = Input.GetButton("Crouch");
     }
-    private void MovementUpdate() 
+    private void MovementUpdate()
     {
         HandleSpeedMultiplier();
-        moveDirection = (bodyOrientation.forward * inputVertical + bodyOrientation.right * inputHorizontal).normalized * baseSpeed * speedMultiplier + new Vector3(0,moveDirection.y,0);
+        moveDirection = (bodyOrientation.forward * inputVertical + bodyOrientation.right * inputHorizontal).normalized * baseSpeed * speedMultiplier + new Vector3(0, moveDirection.y, 0);
         characterController.Move(moveDirection * Time.deltaTime);
     }
-    private void HandleSpeedMultiplier() 
+    private void HandleSpeedMultiplier()
     {
         if (inputCrouch) speedMultiplier = crouchMultiplier;
         else speedMultiplier = 1;
         speedMultiplier = speedMultiplier * buffSpeed * debuffSpeed;
     }
-    private void HandleSoundEmition() 
+    public void ApplySpeedBuff(float buffAmount, float buffDuration)
+    {
+        hasBuffSpeed = true;
+        currentBuffSpeedDuration = buffDuration;
+        buffSpeed = buffAmount;
+    }
+    private void HandleSpeedBuff()
+    {
+        if (hasBuffSpeed)
+        {
+            if (currentBuffSpeedDuration > 0)
+            {
+                currentBuffSpeedDuration -= Time.deltaTime;
+            }
+            else
+            {
+                hasBuffSpeed = false;
+                buffSpeed = 1;
+            }
+        }
+    }
+    private void HandleSoundEmition()
     {
         if (!inputCrouch)
         {
@@ -107,13 +139,13 @@ public class PlayerController : MonoBehaviour
         }
         else noiseCollider.enabled = false;
     }
-    private void HandleGravity() 
+    private void HandleGravity()
     {
-        if (characterController.isGrounded) 
+        if (characterController.isGrounded)
         {
             moveDirection.y = groundedGravity;
         }
-        else 
+        else
         {
             moveDirection.y += gravity * Time.deltaTime;
         }
@@ -129,32 +161,53 @@ public class PlayerController : MonoBehaviour
         //Debug.Log("Gravedad Utilizada: " + gravity);
         // ---------------------------------------------
     }
-    private void HandleJump() 
+    public void ApplyJumpBuff(float buffAmount, float buffDuration)
     {
-        if (!isJumping && characterController.isGrounded && inputJump) 
+        hasBuffJump = true;
+        currentBuffJumpDuration = buffDuration;
+        buffJump = buffAmount;
+    }
+    private void HandleJump()
+    {
+        if (!isJumping && characterController.isGrounded && inputJump)
         {
             isJumping = true;
-            moveDirection.y = initialJumpVelocity;
+            moveDirection.y = initialJumpVelocity * buffJump;
         }
-        else if(isJumping && characterController.isGrounded)
+        else if (isJumping && characterController.isGrounded)
         {
             isJumping = false;
         }
     }
-    private void HandleHeight() 
+    private void HandleJumpBuff()
     {
-        if (inputCrouch) 
+        if (hasBuffJump)
+        {
+            if (currentBuffJumpDuration > 0)
+            {
+                currentBuffJumpDuration -= Time.deltaTime;
+            }
+            else
+            {
+                hasBuffJump = false;
+                buffJump = 1;
+            }
+        }
+    }
+    private void HandleHeight()
+    {
+        if (inputCrouch)
         {
             characterController.height = 1;
-            bodyOrientation.localScale = new Vector3(1,0.5f,1);
+            bodyOrientation.localScale = new Vector3(1, 0.5f, 1);
         }
-        else 
+        else
         {
             characterController.height = 2;
             bodyOrientation.localScale = new Vector3(1, 1, 1);
         }
     }
-    public void GetDamage(float damage) 
+    public void GetDamage(float damage)
     {
         currentHealth -= damage;
 
@@ -166,10 +219,10 @@ public class PlayerController : MonoBehaviour
             gameManager.LossRun();
         }
     }
-    public void GetHeal(float heal) 
+    public void GetHeal(float heal)
     {
         currentHealth += heal;
         if (currentHealth < maxHealth) currentHealth = maxHealth;
-        playerUIManager.UpdateHealthBar(maxHealth,currentHealth);
+        playerUIManager.UpdateHealthBar(maxHealth, currentHealth);
     }
 }

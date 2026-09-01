@@ -35,7 +35,6 @@ public class MeleeEnemyController : MonoBehaviour
         Chasing,
         Attaking,
     }
-
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -45,7 +44,11 @@ public class MeleeEnemyController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        switch (currentState) 
+        if (currentCooldownTime > 0f)
+        {
+            currentCooldownTime -= Time.deltaTime;
+        }
+        switch (currentState)
         {
             case EMeleeEnemyStates.Patrol:
                 agent.speed = speedPatrol;
@@ -59,27 +62,21 @@ public class MeleeEnemyController : MonoBehaviour
                 BehaviourAttak();
                 break;
         }
+        
     }
     private void BehaviourAttak()
     {
-        if (currentCooldownTime > 0f)
+        if (!attackCollider.enabled) attackCollider.enabled = true;
+        if (currentAttackDuration < attackDuration)
         {
-            currentCooldownTime -= Time.deltaTime;
+            currentAttackDuration += Time.deltaTime;
         }
-        else 
+        else
         {
-            if (!attackCollider.enabled) attackCollider.enabled = true;
-            if (currentAttackDuration < attackDuration) 
-            {
-                currentAttackDuration += Time.deltaTime;
-            }
-            else 
-            {
-                currentCooldownTime = attackCooldown;
-                currentAttackDuration = 0;
-                attackCollider.enabled = false;
-                currentState = EMeleeEnemyStates.Patrol;
-            }
+            currentCooldownTime = attackCooldown;
+            currentAttackDuration = 0;
+            attackCollider.enabled = false;
+            currentState = EMeleeEnemyStates.Patrol;
         }
     }
     private void BehaviourChase()
@@ -90,7 +87,7 @@ public class MeleeEnemyController : MonoBehaviour
             if (agent.remainingDistance < agent.stoppingDistance)
             {
                 agent.velocity = Vector3.zero;
-                currentState = EMeleeEnemyStates.Attaking;
+                if (currentCooldownTime <= 0) currentState = EMeleeEnemyStates.Attaking;
             }
         }
         else 
@@ -129,7 +126,6 @@ public class MeleeEnemyController : MonoBehaviour
     }
     private bool GetRandomPointToRoam() 
     {
-        //Debug.Log("try get random point");
         float tempValue = Random.Range(minDistanceRoam, maxDistanceRoam);
         Vector3 randomPoint = transform.position + Random.onUnitSphere * tempValue;
         NavMeshHit hit;

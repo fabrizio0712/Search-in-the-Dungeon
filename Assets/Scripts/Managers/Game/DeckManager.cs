@@ -14,13 +14,24 @@ public class DeckManager : MonoBehaviour
 
     [Header("Cards")]
     [SerializeField] private Transform cardPosition;
-    [SerializeField] private CardLogic currentCard;
+    [SerializeField] private GameObject currentCard;
     [SerializeField] private List<GameObject> deck = new List<GameObject>();
 
+    
     private void Start()
     {
+        // Retirar el if una vez implementado correctamente el flujo de juego al iniciar desde el menu
+        if (GameInstance.instance != null)
+        {
+            deck.Clear();
+            foreach(GameObject card in GameInstance.instance.CurrentDeck) 
+            {
+                deck.Add(card);
+            }
+        }
         DeckCountUpdate();
     }
+
     private void Update()
     {
         if(currentDrawTime < drawTime) 
@@ -38,13 +49,13 @@ public class DeckManager : MonoBehaviour
         if (deck.Count > 0)
         {
             int temp = Random.Range(0, deck.Count);
-            currentCard = deck[temp].GetComponent<CardLogic>();
+            currentCard = deck[temp];
             deck.Remove(currentCard.gameObject);
             DeckCountUpdate();
-            Instantiate(currentCard.gameObject,cardPosition);
-            currentCard.GameManager = gameManager;
-            currentCard.SetUpCard();
-            currentCard.ActivateCard();
+            currentCard = Instantiate(currentCard, cardPosition);
+            currentCard.GetComponent<CardLogic>().GameManager = gameManager;
+            currentCard.GetComponent<CardLogic>().SetUpCard(true);
+            currentCard.GetComponent<CardLogic>().ActivateCard();
         }
         else Debug.Log("No cards in Deck");
     }

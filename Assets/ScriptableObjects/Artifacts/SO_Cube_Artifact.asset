@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3fab9e3d2792f2640b21b88093f872ef, type: 3}
   m_Name: SO_Cube_Artifact
   m_EditorClassIdentifier: Assembly-CSharp::SO_Artifact
-  Name: 
-  Value: 0
-  Level: 0
+  Name: Cube
+  Value: 60
+  Level: 1

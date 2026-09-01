@@ -1,13 +1,16 @@
 using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI;
 using TMPro;
-using Unity.VisualScripting;
 
 public class GameManager : MonoBehaviour
 {
-    [Header("UI Elements")]
+    [Header("UI Containers")]
+    [SerializeField] private GameObject uIGameplay;
+    [SerializeField] private GameObject uIPause;
+    [SerializeField] private GameObject uIRewards;
+
+    [Header("UI Gameplay Elements")]
     [SerializeField] private GameObject uiInteract;
     [SerializeField] private GameObject uiCompass;
     [SerializeField] private TextMeshProUGUI riskText;
@@ -24,7 +27,6 @@ public class GameManager : MonoBehaviour
     [SerializeField] private int maxRiskLevel = 10;
     [SerializeField] private int riskBlockCount = 0;
     [SerializeField] private bool riskTrapsActive = false;
-
     [SerializeField] private List<GameObject> risksLevel1 = new List<GameObject>();
 
     [Header("Hazards")]
@@ -50,47 +52,68 @@ public class GameManager : MonoBehaviour
 
     [Header("Other Elements")]
     [SerializeField] private PlayerController player;
+    [SerializeField] private bool isPaused = false;
+    [SerializeField] private bool isRunEnded = false;
 
     // Public References
     public PlayerController Player { get => player;}
     public Artifact CurrentActiveArtifact { get => currentActiveArtifact;}
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+
     void Start()
     {
         exitTrigger = GetComponent<Collider>();
         SpanwRandomArtifact();
-
-        //---- Debug Show Block Updates -----
-        //AddHazardBlock(3);
-        //AddRiskBlock(5);
         UIHazardBlockUpdate();
         UIRiskBlockUpdate();
-        //----------------------------------- 
     }
 
-    // Update is called once per frame
     void Update()
     {
-        //-------- Debug Risk And Hazard Logics--------
-        if(hazardCurrentTimer < hazardTimer) hazardCurrentTimer += Time.deltaTime;
-        else 
+        if (!isRunEnded)
         {
-            hazardCurrentTimer = 0f;
-            HazardUpdate(1);
-        }/*
-        if(riskCurrentTimer <  riskTimer) riskCurrentTimer += Time.deltaTime;
-        else 
-        {
-            riskCurrentTimer = 0f;
-            RiskUpdate(1);
-        }*/
-        // --------------------------------------------
+            // ------------ Hazard Timer Logic ---------------
+            if (hazardCurrentTimer < hazardTimer)
+            {
+                hazardCurrentTimer += Time.deltaTime;
+            }
+            else
+            {
+                hazardCurrentTimer = 0f;
+                HazardUpdate(1);
+            }
+            // -----------------------------------------------
+
+            // ------------ Pause Input Logic ----------------
+            if (Input.GetButtonDown("Cancel"))
+            {
+                if (!isPaused)
+                {
+                    Pause();
+                }
+                else
+                {
+                    Resume();
+                }
+            }
+        }
+        // -----------------------------------------------
+
+            //-------- Debug Risk Logic--------
+            /*if(riskCurrentTimer <  riskTimer) riskCurrentTimer += Time.deltaTime;
+            else 
+            {
+                riskCurrentTimer = 0f;
+                RiskUpdate(1);
+            }*/
+            // --------------------------------------------
     }
+
+    // -------------- Artifacts Functions--------------
     private void SpanwRandomArtifact()
     { 
-        int randomArtifact = Random.Range(0, artifactsLevel1.Count);
-        int randomSpawnPoint = Random.Range(0, artifactsSpawnpointsLevel1.Count);
+        int randomArtifact = UnityEngine.Random.Range(0, artifactsLevel1.Count);
+        int randomSpawnPoint = UnityEngine.Random.Range(0, artifactsSpawnpointsLevel1.Count);
         artifactsLevel1[randomArtifact].SetActive(true);
         artifactsLevel1[randomArtifact].transform.position = artifactsSpawnpointsLevel1[randomSpawnPoint].transform.position;
         currentActiveArtifact = artifactsLevel1[randomArtifact].GetComponent<Artifact>();
@@ -102,6 +125,9 @@ public class GameManager : MonoBehaviour
         exitTrigger.enabled = true;
         uiCompass.SetActive(false);
     }
+    // ------------------------------------------------
+
+    // ----------- Risk Functions --------------------- 
     public void AddRiskBlock(int amount) 
     {
         riskBlockCount += amount;
@@ -140,6 +166,9 @@ public class GameManager : MonoBehaviour
             }
         }
     }
+    // ------------------------------------------------
+
+    // ----------- Hazard Functions -------------------
     public void AddHazardBlock(int amount) 
     {
         hazardBlockCount += amount;
@@ -166,14 +195,16 @@ public class GameManager : MonoBehaviour
         }
         else
         {
-            int randomHazard = Random.Range(0, hazardsLevel1.Count);
+            int randomHazard = UnityEngine.Random.Range(0, hazardsLevel1.Count);
             Hazard temp = hazardsLevel1[randomHazard];
             temp.TryToBlock();
             hazardsLevel1.Remove(temp);
             audioSource.PlayOneShot(hazardAudioCip);
         }
     }
-    //--------- Logicas de la UI ----------
+    // ------------------------------------------------
+
+    // --------- UI Gameplay Functions ----------------
     public void UIShowInteract(bool value) 
     {
         uiInteract.SetActive(value);
@@ -190,7 +221,37 @@ public class GameManager : MonoBehaviour
     {
         hazardBlockText.text = hazardBlockCount.ToString();
     }
-    
+    // ------------------------------------------------
+
+    // --------- UI Pause Functions -------------------
+    public void Resume() 
+    {
+        isPaused = false;
+        uIPause.SetActive(false);
+        uIGameplay.SetActive(true);
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+        Time.timeScale = 1;
+    }
+    public void Pause() 
+    {
+        isPaused = true;
+        uIPause.SetActive(true);
+        uIGameplay.SetActive(false);
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+        Time.timeScale = 0;
+    }
+    public void Options() 
+    {
+
+    }
+    public void ExitRun() 
+    {
+        BackToMenu();
+    }
+    // ------------------------------------------------
+
     //--------- Finish Run ----------
 
     // Volver al menu
@@ -199,12 +260,19 @@ public class GameManager : MonoBehaviour
         // Guardar Progresión
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
+        Time.timeScale = 1;
         SceneManager.LoadScene(0);
     }
     // Ganar Run
     private void EndRun()
     {
         // Logica de compra de cartas
+        isRunEnded = true;
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+        uIGameplay.SetActive(false);
+        uIRewards.SetActive(true);
+        Time.timeScale = 0;
     }
     // Perder Run
     public void LossRun() 
@@ -216,7 +284,5 @@ public class GameManager : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         EndRun();
-        // Logica temporal para volver al menu
-        BackToMenu();
     }
 }

@@ -9,6 +9,7 @@ public class PlayerCameraController : MonoBehaviour
     private float xRotation = 0;
     private float yRotation = 0;
 
+    
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -27,5 +28,6 @@ public class PlayerCameraController : MonoBehaviour
         transform.rotation = Quaternion.Euler(xRotation, yRotation, 0);
         orientation.rotation = Quaternion.Euler(0, yRotation, 0);
         transform.position = cameraPosition.position;
+        
     }
 }
