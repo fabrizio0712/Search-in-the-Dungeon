@@ -29,7 +29,7 @@ public class RewardManager : MonoBehaviour
     }
     private void SetUpShop() 
     {
-        currentEmbers = gameManager.CurrentActiveArtifact.ArtifactInfo.Value;
+        currentEmbers = gameManager.CurrentActiveArtifact.ArtifactInfo.Value + gameManager.AditionalEmbers;
         UIEmbersUpdate();
         cardShopOptions[0].SetUpCardOption(Instantiate(GetRandomCard(commonCards), cardsTranformParents[0]));
         cardShopOptions[1].SetUpCardOption(Instantiate(GetRandomCard(commonCards), cardsTranformParents[1]));
@@ -40,7 +40,9 @@ public class RewardManager : MonoBehaviour
     private GameObject GetRandomCard( List<GameObject> cardList) 
     {
         int temp = Random.Range(0, cardList.Count);
-        return cardList[temp];
+        GameObject tempCard = cardList[temp];
+        cardList.Remove(tempCard);
+        return tempCard;
     }
     public void UpdateCurrentEmbers(int amount) 
     {

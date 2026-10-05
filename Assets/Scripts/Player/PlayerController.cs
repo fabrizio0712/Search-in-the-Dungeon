@@ -211,7 +211,10 @@ public class PlayerController : MonoBehaviour
     {
         currentHealth -= damage;
 
-        if (currentHealth > 0) playerUIManager.UpdateHealthBar(maxHealth, currentHealth);
+        if (currentHealth > 0) 
+        { 
+            playerUIManager.UpdateHealthBar(maxHealth, currentHealth);
+        }
         else
         {
             currentHealth = 0;
@@ -222,7 +225,7 @@ public class PlayerController : MonoBehaviour
     public void GetHeal(float heal)
     {
         currentHealth += heal;
-        if (currentHealth < maxHealth) currentHealth = maxHealth;
+        if (currentHealth > maxHealth) currentHealth = maxHealth;
         playerUIManager.UpdateHealthBar(maxHealth, currentHealth);
     }
 }

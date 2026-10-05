@@ -1,18 +1,23 @@
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Audio;
 
-public class GameInstance : MonoBehaviour
+public class GameInstance : MonoBehaviour, IDataPersistence
 {
     public static GameInstance instance { get; private set; }
     public List<GameObject> CurrentDeck { get => currentDeck; set => currentDeck = value; }
     public List<GameObject> CardList { get => cardList; }
     public Dictionary<int, GameObject> CardsReferences { get => cardsReferences; }
     public Dictionary<int, int> CardsObtained { get => cardsObtained; }
+    public int MaxCardsInDeck { get => maxCardsInDeck; }
 
     [SerializeField] private List<GameObject> currentDeck = new List<GameObject>();
     [SerializeField] private List<GameObject> cardList = new List<GameObject>();
     [SerializeField] private Dictionary<int, GameObject> cardsReferences = new Dictionary<int, GameObject>();
     [SerializeField] private Dictionary<int, int> cardsObtained = new Dictionary<int, int>();
+    [SerializeField] private int maxCardsInDeck;
+    [SerializeField] private AudioMixer audioMixer;
 
     private void Awake()
     {
@@ -25,12 +30,14 @@ public class GameInstance : MonoBehaviour
                 cardsReferences.Add(temp, card);
                 cardsObtained.Add(temp, 0);
             }
+            // -----------------------------------------------------------------------------------
             // logica de prueba para actualizar numero de copias obtenidas sin sistema de guardado
             foreach(GameObject card in currentDeck) 
             {
                 int temp = card.GetComponent<CardLogic>().CardInfo.cardID;
                 cardsObtained[temp] += 1;
             }
+            // -----------------------------------------------------------------------------------
         }
         else if(instance != this) 
         {
@@ -38,13 +45,15 @@ public class GameInstance : MonoBehaviour
         }
         DontDestroyOnLoad(this);
     }
+    private void Start()
+    {
+        CheckPlayerPrefs();
+    }
     public void ObtainCard(int obtained) 
     {
         if (cardsObtained.ContainsKey(obtained)) 
         {
             cardsObtained[obtained] += 1;
-            // Añadido Temporal Para Prueba de Compra
-            //currentDeck.Add(cardsReferences[obtained]);
         }
     }
     public void AddCardToDeck(int cardID) 
@@ -55,21 +64,50 @@ public class GameInstance : MonoBehaviour
     {
         currentDeck.Remove(cardsReferences[cardID]);
     }
-
-
-    public void NewGame() 
+    private void CheckPlayerPrefs()
     {
-        // Armar Default Deck
-        // Actualizar Cartas obtenidas segun el Default Deck
+        if (PlayerPrefs.HasKey("MasterVolume")) 
+        {
+            audioMixer.SetFloat("Master",PlayerPrefs.GetFloat("MasterVolume"));
+        }
+        if (PlayerPrefs.HasKey("MusicVolume"))
+        {
+            audioMixer.SetFloat("Music", PlayerPrefs.GetFloat("MusicVolume"));
+        }
+        if (PlayerPrefs.HasKey("SFXVolume"))
+        {
+            audioMixer.SetFloat("SFX", PlayerPrefs.GetFloat("SFXVolume"));
+        }
     }
-    public void SaveData() 
+
+    public void LoadData(GameData gameData)
     {
-        // Guardar Cartas Desbloqueadas
-        // Guardar Deck Actual
+        if (gameData.currentDeck.Count > 0)
+        {
+            currentDeck.Clear();
+            foreach (int id in gameData.currentDeck)
+            {
+                currentDeck.Add(cardsReferences[id]);
+            }
+            cardsObtained.Clear();
+            foreach (var dic in gameData.cardsCount)
+            {
+                cardsObtained.Add(dic.Key, dic.Value);
+            }
+        }
     }
-    public void LoadData()
+
+    public void SaveData(ref GameData gameData)
     {
-        // Cargar Cartas Desbloqueadas
-        // Cargar Deck Actual
+        gameData.currentDeck.Clear();
+        foreach(GameObject go in currentDeck) 
+        {
+            gameData.currentDeck.Add(go.GetComponent<CardLogic>().CardInfo.cardID);
+        }
+        gameData.cardsCount.Clear();
+        foreach(var dic in cardsObtained) 
+        {
+            gameData.cardsCount.Add(dic.Key, dic.Value);
+        }
     }
 }

@@ -8,6 +8,7 @@ public class MeleeEnemyController : MonoBehaviour
     [SerializeField] private Transform body;
     [SerializeField] private NavMeshAgent agent;
     [SerializeField] private Collider attackCollider;
+    [SerializeField] private AudioSource audio;
 
     [Header("Patrol Variables")]
     [SerializeField] private float speedPatrol;
@@ -44,6 +45,14 @@ public class MeleeEnemyController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if(Time.timeScale == 0) 
+        {
+            if (audio.isPlaying) audio.Pause();
+        }
+        else 
+        {
+            if (!audio.isPlaying) audio.UnPause();
+        }
         if (currentCooldownTime > 0f)
         {
             currentCooldownTime -= Time.deltaTime;

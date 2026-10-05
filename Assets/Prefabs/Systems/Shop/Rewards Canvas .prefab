@@ -376,9 +376,13 @@ MonoBehaviour:
   commonCards:
   - {fileID: 2059842670487496696, guid: 2d901e4a1d1e0a44b8fb32840b30f04a, type: 3}
   - {fileID: 2059842670487496696, guid: dbd7c9fb7930ec34e87f9f56d2150765, type: 3}
+  - {fileID: 2059842670487496696, guid: e4962becfeddb254ba5836ac45420fff, type: 3}
   rareCards:
   - {fileID: 2059842670487496696, guid: 3dbc74bec954d6e488f5dcd0eed6c5cd, type: 3}
+  - {fileID: 2059842670487496696, guid: 9fc2ee9095711a34d95471d96487a490, type: 3}
+  - {fileID: 2059842670487496696, guid: 3e91e9cb631d6214a8b6200b8eba49b3, type: 3}
   - {fileID: 2059842670487496696, guid: 94bfc2568e43b0248937f7799279bb21, type: 3}
+  - {fileID: 2059842670487496696, guid: bf58277b8037cd345ba4807e544e7be5, type: 3}
   superCards:
   - {fileID: 2059842670487496696, guid: a5906c9ce61e6334d8333b547e930592, type: 3}
   embersText: {fileID: 9123206749815362188}

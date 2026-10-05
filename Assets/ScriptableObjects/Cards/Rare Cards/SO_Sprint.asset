@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8fb45163e232027418c62cdeeb1e6ccd, type: 3}
   m_Name: SO_Sprint
   m_EditorClassIdentifier: Assembly-CSharp::SO_Card
-  cardID: 4
+  cardID: 9
   cardName: Sprint
   cardDescription: Increase Speed for 60 Seconds
   cardMaxCopies: 3

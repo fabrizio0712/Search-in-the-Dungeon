@@ -1,5 +1,4 @@
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -8,6 +7,8 @@ public class CardShopOption : MonoBehaviour
     [SerializeField] private RewardManager rewardManager;
     [SerializeField] private Button buyButton;
     [SerializeField] private TextMeshProUGUI cardValue;
+    [SerializeField] private GameObject greyOut;
+    [SerializeField] private TextMeshProUGUI greyOutText;
     
     private GameObject cardGameObject;
     private CardLogic card;
@@ -16,8 +17,14 @@ public class CardShopOption : MonoBehaviour
     {
         cardGameObject = GivedCard;
         card = cardGameObject.GetComponent<CardLogic>();
+        card.SetUpCard(false);
         cardValue.SetText(card.CardInfo.cardPrice.ToString());
         CheckEnoughEmbers();
+        if (GameInstance.instance.CardsObtained[card.CardInfo.cardID] >= card.CardInfo.cardMaxCopies) 
+        {
+            greyOut.SetActive(true);
+            greyOutText.text = "Maxed Copies";
+        }
     }
     public void CheckEnoughEmbers() 
     {
@@ -33,5 +40,8 @@ public class CardShopOption : MonoBehaviour
         {
             GameInstance.instance.ObtainCard(card.CardInfo.cardID);
         }
+        buyButton.interactable = false;
+        greyOut.SetActive(true);
+        greyOutText.text = "Sold";
     }
 }

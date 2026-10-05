@@ -165,14 +165,15 @@ MonoBehaviour:
   body: {fileID: 4501803776710638735}
   agent: {fileID: 1369082826630687133}
   attackCollider: {fileID: 7250672732925311099}
-  speedPatrol: 1
-  minDistanceRoam: 3
-  maxDistanceRoam: 10
-  timeUntilNextRoamPoint: 1
-  speedChasing: 3
-  attackDamage: 0
-  attackCooldown: 0
-  attackDuration: 0
+  audio: {fileID: 7828061977613323810}
+  speedPatrol: 2
+  minDistanceRoam: 5
+  maxDistanceRoam: 15
+  timeUntilNextRoamPoint: 3
+  speedChasing: 3.5
+  attackDamage: 40
+  attackCooldown: 2
+  attackDuration: 0.2
   currentState: 0
 --- !u!114 &8591301398785798357
 MonoBehaviour:
@@ -187,7 +188,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FieldOfView
   viewRange: 10
-  viewAngle: 180
+  viewAngle: 270
   viewDelay: 0.1
   minDistance: 1
   bodyViewTransform: {fileID: 4501803776710638735}
@@ -196,7 +197,7 @@ MonoBehaviour:
     m_Bits: 64
   obstacleMask:
     serializedVersion: 2
-    m_Bits: 311
+    m_Bits: 257
   visibleTargets: []
   hasVisualTarget: 0
 --- !u!195 &1369082826630687133
@@ -240,8 +241,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 0
   serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 1, z: 1}
+  m_Size: {x: 1.5, y: 2, z: 1.5}
+  m_Center: {x: 0, y: 1, z: 1.25}
 --- !u!82 &7828061977613323810
 AudioSource:
   m_ObjectHideFlags: 0
@@ -264,7 +265,7 @@ AudioSource:
   Priority: 128
   DopplerLevel: 1
   MinDistance: 1
-  MaxDistance: 15
+  MaxDistance: 12
   Pan2D: 0
   rolloffMode: 1
   BypassEffects: 0

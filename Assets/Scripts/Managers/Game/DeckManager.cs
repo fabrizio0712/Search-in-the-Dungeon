@@ -17,6 +17,9 @@ public class DeckManager : MonoBehaviour
     [SerializeField] private GameObject currentCard;
     [SerializeField] private List<GameObject> deck = new List<GameObject>();
 
+    [Header("StumbleCard")]
+    [SerializeField] private GameObject stumblePrefab;
+
     
     private void Start()
     {
@@ -62,6 +65,11 @@ public class DeckManager : MonoBehaviour
     private void DeckCountUpdate() 
     {
         deckIndicator.text = deck.Count.ToString();
+    }
+    public void AddStumbleToDeck() 
+    {
+        deck.Add(stumblePrefab);
+        DeckCountUpdate();
     }
 
 }

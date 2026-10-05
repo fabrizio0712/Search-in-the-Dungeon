@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8fb45163e232027418c62cdeeb1e6ccd, type: 3}
   m_Name: SO_DungeonRepairs
   m_EditorClassIdentifier: Assembly-CSharp::SO_Card
-  cardID: 5
+  cardID: 20
   cardName: Dungeon Repairs
   cardDescription: Block 7 Hazards, but Increase 1 Risk
   cardMaxCopies: 1

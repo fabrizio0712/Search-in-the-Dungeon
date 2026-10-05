@@ -49,10 +49,13 @@ public class CardLogic : MonoBehaviour
                 cardBackground.color = Color.grey;
                 break;
             case SO_Card.CardRarity.rare:
-                cardBackground.color = Color.green;
+                cardBackground.color = Color.darkGreen;
                 break;
             case SO_Card.CardRarity.super:
-                cardBackground.color = Color.blue;
+                cardBackground.color = Color.darkBlue;
+                break;
+            case SO_Card.CardRarity.danger:
+                cardBackground.color = Color.darkRed;
                 break;
         }
     }

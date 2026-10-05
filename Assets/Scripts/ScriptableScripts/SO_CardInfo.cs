@@ -17,6 +17,7 @@ public class SO_Card : ScriptableObject
         comon,
         rare,
         super,
+        danger,
     }
 
 

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class CardCollectionManager : MonoBehaviour
@@ -8,6 +9,7 @@ public class CardCollectionManager : MonoBehaviour
 
     [Header("DeckReferences")]
     [SerializeField] private GameObject deckZone;
+    [SerializeField] private TextMeshProUGUI deckCount;
     [SerializeField] private List<GameObject> deckCards = new List<GameObject>();
 
     [Header("CollectionReferences")]
@@ -67,6 +69,7 @@ public class CardCollectionManager : MonoBehaviour
                 }
             }
         }
+        deckCount.text = deckCards.Count + " / " + GameInstance.instance.MaxCardsInDeck;
     }
     public void SendCardToCollection(CollectionCard sendedCard) 
     {
@@ -87,23 +90,26 @@ public class CardCollectionManager : MonoBehaviour
     }
     public void SendCardToDeck(CollectionCard sendedCard) 
     {
-        if (!deckCards.Contains(sendedCard.gameObject))
+        if (deckCards.Count < GameInstance.instance.MaxCardsInDeck) 
         {
-            if (CheckCopiesInDeck(sendedCard.Card.CardInfo))
+            if (!deckCards.Contains(sendedCard.gameObject))
             {
-                foreach (CollectionCard cardInCollection in cardCollection)
+                if (CheckCopiesInDeck(sendedCard.Card.CardInfo))
                 {
-                    if (cardInCollection.Card.CardInfo.cardID == sendedCard.Card.CardInfo.cardID)
+                    foreach (CollectionCard cardInCollection in cardCollection)
                     {
-                        cardInCollection.DecreaseCardCount(1);
+                        if (cardInCollection.Card.CardInfo.cardID == sendedCard.Card.CardInfo.cardID)
+                        {
+                            cardInCollection.DecreaseCardCount(1);
+                        }
                     }
+                    GameObject temp = Instantiate(cardCollectionReference, deckZone.transform);
+                    temp.GetComponent<CollectionCard>().Initializer(GameInstance.instance.CardsReferences[sendedCard.Card.CardInfo.cardID], this, false);
+                    temp.GetComponent<CollectionCard>().SetCardCount(1);
+                    deckCards.Add(temp);
+                    GameInstance.instance.AddCardToDeck(sendedCard.Card.CardInfo.cardID);
+                    SortDeck();
                 }
-                GameObject temp = Instantiate(cardCollectionReference, deckZone.transform);
-                temp.GetComponent<CollectionCard>().Initializer(GameInstance.instance.CardsReferences[sendedCard.Card.CardInfo.cardID], this, false);
-                temp.GetComponent<CollectionCard>().SetCardCount(1);
-                deckCards.Add(temp);
-                GameInstance.instance.AddCardToDeck(sendedCard.Card.CardInfo.cardID);
-                SortDeck();
             }
         }
     }

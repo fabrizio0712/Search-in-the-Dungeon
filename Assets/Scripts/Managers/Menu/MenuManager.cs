@@ -7,6 +7,7 @@ public class MenuManager : MonoBehaviour
     [SerializeField] private GameObject firstMenu;
     [SerializeField] private GameObject instanceMenu;
     [SerializeField] private GameObject deckBuilderMenu;
+    [SerializeField] private GameObject optionsMenu;
 
     public enum ECurrentMenu {first,instance }
     public static ECurrentMenu currentMenu = ECurrentMenu.first;
@@ -22,11 +23,13 @@ public class MenuManager : MonoBehaviour
                 firstMenu.SetActive(true);
                 instanceMenu.SetActive(false);
                 deckBuilderMenu.SetActive(false);
+                optionsMenu.SetActive(false);
                 break;
             case ECurrentMenu.instance:
                 firstMenu.SetActive(false);
                 instanceMenu.SetActive(true);
                 deckBuilderMenu.SetActive(false);
+                optionsMenu.SetActive(false);
                 break;
         }
     }
@@ -49,26 +52,11 @@ public class MenuManager : MonoBehaviour
     {
         SceneManager.LoadScene(1);
     }
-    public void BuildDeck() 
-    {
-        instanceMenu.SetActive(false);
-        deckBuilderMenu.SetActive(true);
-    }
-    public void Collections() { }
-    public void Options() { }
     public void InstanceMenuToFirstMenu()
     {
         instanceMenu.SetActive(false);
         firstMenu.SetActive(true);
         currentMenu = ECurrentMenu.first;
-    }
-    // ---------------------------------------
-
-    // ----------- Deck Builder --------------
-    public void DeckMenuToInstanceMenu() 
-    {
-        deckBuilderMenu.SetActive(false);
-        instanceMenu.SetActive(true);
     }
     // ---------------------------------------
 }
