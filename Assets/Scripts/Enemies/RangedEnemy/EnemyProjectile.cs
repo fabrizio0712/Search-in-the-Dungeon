@@ -43,14 +43,8 @@ public class EnemyProjectile : MonoBehaviour
         if (other.gameObject != owner)
         {
             //Debug.Log("Non Owner Projectile Trigger");
-            if (other.gameObject.tag != "Player") 
+            if (other.gameObject.CompareTag("Player")) 
             {
-                //Debug.Log("Non Player Projectile Trigger");
-                gameObject.SetActive(false); 
-            }
-            else
-            {
-                //Debug.Log("Player Projectile Trigger");
                 other.gameObject.GetComponent<PlayerController>().GetDamage(projectileDamage);
                 gameObject.SetActive(false);
             }

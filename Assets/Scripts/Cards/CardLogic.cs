@@ -17,13 +17,17 @@ public class CardLogic : MonoBehaviour
     [SerializeField] private List<CardEffect> cardEffects = new List<CardEffect>();
     private GameManager gameManager;
     private float currentDuration = 0;
+    private AudioSource audioSource;
 
     public bool LogicActive;
 
     public GameManager GameManager { get => gameManager; set => gameManager = value; }
     public SO_Card CardInfo { get => cardInfo; }
 
-
+    private void Awake()
+    {
+        audioSource = GetComponent<AudioSource>();
+    }
     private void Update()
     {
         if (LogicActive)
@@ -43,7 +47,7 @@ public class CardLogic : MonoBehaviour
         cardDescription.text = cardInfo.cardDescription;
         cardMaxCopies.text = cardInfo.cardMaxCopies.ToString();
         cardImage.sprite = cardInfo.cardImage;
-        switch (cardInfo.cardRarity) 
+        /*switch (cardInfo.cardRarity) 
         {
             case SO_Card.CardRarity.comon:
                 cardBackground.color = Color.grey;
@@ -57,10 +61,11 @@ public class CardLogic : MonoBehaviour
             case SO_Card.CardRarity.danger:
                 cardBackground.color = Color.darkRed;
                 break;
-        }
+        }*/
     }
     public void ActivateCard() 
     {
+        audioSource.Play();
         foreach(CardEffect card in cardEffects) 
         {
             card.GameManager = gameManager;

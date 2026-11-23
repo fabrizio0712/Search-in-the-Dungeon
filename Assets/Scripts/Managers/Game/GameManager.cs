@@ -2,6 +2,8 @@ using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine.SceneManagement;
 using TMPro;
+using System.Collections;
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
@@ -9,13 +11,15 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject uIGameplay;
     [SerializeField] private GameObject uIPause;
     [SerializeField] private GameObject uIRewards;
+    [SerializeField] private GameObject uIGameOver;
 
     [Header("UI Gameplay Elements")]
     [SerializeField] private GameObject uiInteract;
     [SerializeField] private GameObject uiCompass;
-    [SerializeField] private TextMeshProUGUI riskText;
     [SerializeField] private TextMeshProUGUI riskBlockText;
     [SerializeField] private TextMeshProUGUI hazardBlockText;
+    [SerializeField] private float uIGameOverFadeDuration;
+    [SerializeField] private Image uIGameOverBackground;
 
     [Header("Artifacts")]
     [SerializeField] private List<GameObject> artifactsLevel1 = new List<GameObject>();
@@ -31,13 +35,6 @@ public class GameManager : MonoBehaviour
     [SerializeField] private List<GameObject> crownsPool = new List<GameObject>();
     [SerializeField] private List<GameObject> embersPool = new List<GameObject>();
     [SerializeField] private int aditionalEmbers = 0;
-
-    [Header("Healings")]
-    [SerializeField] private GameObject healingPrefab;
-    [SerializeField] private List<GameObject> healingPool = new List<GameObject>();
-    [SerializeField] private List<GameObject> healingSpawnPoints = new List<GameObject>();
-    [SerializeField] private float spawnHealTime = 1;
-    [SerializeField] private float spawnHealCurrentTime;
 
     [Header("Risks")]
     [SerializeField] private int riskLevel = 0;
@@ -56,10 +53,11 @@ public class GameManager : MonoBehaviour
  
     [Header("Audio and SFX")]
     [SerializeField] private AudioSource audioSource;
-    [SerializeField] private AudioClip riskAudioClip;
-    [SerializeField] private AudioClip blockRiskAudioClip;
-    [SerializeField] private AudioClip hazardAudioCip;
-    [SerializeField] private AudioClip blockHazardAudioClip;
+    [SerializeField] private AudioSource heartbeatAudioSourse;
+    [SerializeField] private AudioClip artifactFoundSound;
+    [SerializeField] private List<AudioClip> blockRiskAudios;
+    [SerializeField] private List<AudioClip> hazardAudios;
+    [SerializeField] private List<AudioClip> blockHazardAudios;
 
     [Header("Other Elements")]
     [SerializeField] private PlayerController player;
@@ -67,6 +65,9 @@ public class GameManager : MonoBehaviour
     [SerializeField] private bool isPaused = false;
     [SerializeField] private bool isRunEnded = false;
     private Collider exitTrigger;
+
+    [Header("Enemies")]
+    [SerializeField] private List<GameObject> enemies;
 
     // Public References
     public PlayerController Player { get => player;}
@@ -79,24 +80,13 @@ public class GameManager : MonoBehaviour
         SpanwRandomArtifact();
         UIHazardBlockUpdate();
         UIRiskBlockUpdate();
+        StartCoroutine(HeartBeat());
     }
 
     void Update()
     {
         if (!isRunEnded)
         {
-            // --------- Spawn Heal Timer Logic --------------
-            if (spawnHealCurrentTime < spawnHealTime)
-            {
-                spawnHealCurrentTime += Time.deltaTime;
-            }
-            else
-            {
-                spawnHealCurrentTime = 0f;
-                SpawnHealObject();
-            }
-            // -----------------------------------------------
-
             // ------------ Hazard Timer Logic ---------------
             if (hazardCurrentTimer < hazardTimer)
             {
@@ -125,46 +115,24 @@ public class GameManager : MonoBehaviour
             // ------------ Pause Input Logic ----------------
             if (Input.GetButtonDown("Cancel"))
             {
-                if (!isPaused)
+                if (!isPaused && !isRunEnded)
                 {
                     Pause();
-                }
-                else
-                {
-                    Resume();
                 }
             }
             // ----------------------------------------------
         }  
     }
     // ----------------------------------------------------
-
-    // -------------- Healing Functions -------------------
-    public void SpawnHealObject() 
+    private IEnumerator HeartBeat() 
     {
-        int randomPosition = Random.Range(0,healingSpawnPoints.Count);
-        Vector3 directionDisplacement = new Vector3(Random.Range(0.1f, 1f), 0, Random.Range(0.1f, 1f));
-        if (healingPool.Count > 0) 
+        while (!isRunEnded) 
         {
-            GameObject spawnedHeal = healingPool[0];
-            spawnedHeal.SetActive(true);
-            spawnedHeal.transform.position = healingSpawnPoints[randomPosition].transform.position;
-            spawnedHeal.GetComponent<Rigidbody>().AddForce(directionDisplacement, ForceMode.Impulse);
-            healingPool.Remove(spawnedHeal);
+            yield return new WaitForSeconds(3f/(1+(riskLevel/3)));
+            heartbeatAudioSourse.Play();
         }
-        else 
-        {
-            GameObject spawnedHeal = Instantiate(healingPrefab);
-            spawnedHeal.GetComponent<HealingLogic>().SetGameManager(this);
-            spawnedHeal.transform.position = healingSpawnPoints[randomPosition].transform.position;
-            spawnedHeal.GetComponent<Rigidbody>().AddForce(directionDisplacement, ForceMode.Impulse);
-        }
+        heartbeatAudioSourse.Stop();
     }
-    public void AddHealObjectToPool(GameObject go) 
-    {
-        healingPool.Add(go);
-    }
-    // ----------------------------------------------------
 
     // -------------- Embers Functions --------------------
     public void SpawnEmbers(int amount) 
@@ -203,13 +171,13 @@ public class GameManager : MonoBehaviour
     { 
         int randomArtifact = Random.Range(0, artifactsLevel1.Count);
         int randomSpawnPoint = Random.Range(0, artifactsSpawnpointsLevel1.Count);
-        artifactsLevel1[randomArtifact].SetActive(true);
-        artifactsLevel1[randomArtifact].transform.position = artifactsSpawnpointsLevel1[randomSpawnPoint].transform.position;
-        currentActiveArtifact = artifactsLevel1[randomArtifact].GetComponent<Artifact>();
+        GameObject tempArtifact = Instantiate(artifactsLevel1[randomArtifact], artifactsSpawnpointsLevel1[randomSpawnPoint].transform.position,Quaternion.identity);
+        currentActiveArtifact = tempArtifact.GetComponent<Artifact>();
         currentActiveArtifact.GameManager = this;
     }
     public void PickUpArtifact()
     {
+        audioSource.PlayOneShot(artifactFoundSound);
         RiskUpdate(3);
         exitTrigger.enabled = true;
         uiCompass.SetActive(false);
@@ -224,32 +192,31 @@ public class GameManager : MonoBehaviour
     }
     public void RiskUpdate(int amount)
     {
+        StartCoroutine(RiskUpdateCorutine(amount));
+    }
+
+    private IEnumerator RiskUpdateCorutine(int amount) 
+    {
         for (int i = 0; i < amount; i++)
         {
+            yield return new WaitForSeconds(1f);
             if (riskBlockCount > 0)
             {
                 riskBlockCount--;
                 UIRiskBlockUpdate();
-                audioSource.PlayOneShot(blockRiskAudioClip);
+                audioSource.PlayOneShot(blockRiskAudios[Random.Range(0,blockRiskAudios.Count)]);
             }
             else
             {
-                if (riskLevel < maxRiskLevel - 1)
+                if (riskLevel < maxRiskLevel)
                 {
                     riskLevel++;
-                    UIRiskUpdate();
-                    audioSource.PlayOneShot(riskAudioClip);
                 }
                 else
                 {
-                    if (riskLevel == 9) 
+                    if (!riskTrapsActive)
                     {
-                        riskLevel++;
-                        UIRiskUpdate();
-                    }
-                    if (!riskTrapsActive) 
-                    {
-                        foreach(GameObject go in risksLevel1) 
+                        foreach (GameObject go in risksLevel1)
                         {
                             go.SetActive(true);
                         }
@@ -259,6 +226,7 @@ public class GameManager : MonoBehaviour
                 }
             }
         }
+
     }
     // ------------------------------------------------
 
@@ -270,13 +238,18 @@ public class GameManager : MonoBehaviour
     }
     public void HazardUpdate(int amount)
     {
+        StartCoroutine(HazardUpdateCorutine(amount));
+    }
+    private IEnumerator HazardUpdateCorutine(int amount) 
+    {
         for (int i = 0; i < amount; i++)
         {
+            yield return new WaitForSeconds(1f);
             if (hazardBlockCount > 0)
             {
                 hazardBlockCount--;
                 UIHazardBlockUpdate();
-                audioSource.PlayOneShot(blockHazardAudioClip);
+                audioSource.PlayOneShot(blockHazardAudios[Random.Range(0,blockHazardAudios.Count)]);
             }
             else ActivateRandomHazard();
         }
@@ -293,7 +266,7 @@ public class GameManager : MonoBehaviour
             Hazard temp = hazardsLevel1[randomHazard];
             temp.TryToBlock();
             hazardsLevel1.Remove(temp);
-            audioSource.PlayOneShot(hazardAudioCip);
+            audioSource.PlayOneShot(hazardAudios[Random.Range(0,hazardAudios.Count)]);
         }
     }
     // ------------------------------------------------
@@ -302,10 +275,6 @@ public class GameManager : MonoBehaviour
     public void UIShowInteract(bool value) 
     {
         uiInteract.SetActive(value);
-    }
-    public void UIRiskUpdate() 
-    {
-        riskText.text = riskLevel.ToString();
     }
     public void UIRiskBlockUpdate()
     {
@@ -338,10 +307,6 @@ public class GameManager : MonoBehaviour
         Time.timeScale = 0;
         audioSource.Pause();
     }
-    public void Options() 
-    {
-
-    }
     public void ExitRun() 
     {
         BackToMenu();
@@ -368,17 +333,29 @@ public class GameManager : MonoBehaviour
         Cursor.visible = true;
         uIGameplay.SetActive(false);
         uIRewards.SetActive(true);
-        Time.timeScale = 0;
+        
+        foreach(GameObject go in enemies) 
+        {
+            go.SetActive(false);
+        }
+        player.gameObject.SetActive(false);
+        deckManager.gameObject.SetActive(false);
     }
     // Perder Run
     public void LossRun() 
     {
-        // Logica de perder
-        BackToMenu();
+        StartCoroutine(LossLogic());
     }
     // Trigger de Victoria
     private void OnTriggerEnter(Collider other)
     {
         EndRun();
+    }
+    IEnumerator LossLogic() 
+    {
+        isRunEnded = true;
+        uIGameOver.SetActive(true);
+        yield return new WaitForSeconds(uIGameOverFadeDuration);
+        BackToMenu();
     }
 }

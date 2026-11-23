@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -8,6 +9,12 @@ public class MenuManager : MonoBehaviour
     [SerializeField] private GameObject instanceMenu;
     [SerializeField] private GameObject deckBuilderMenu;
     [SerializeField] private GameObject optionsMenu;
+
+    [Header("Audios")]
+    [SerializeField] private AudioSource audioSource;
+    [SerializeField] private AudioClip newRunClip;
+    [SerializeField] private AudioClip clickClip;
+    [SerializeField] private AudioClip exitClip;
 
     public enum ECurrentMenu {first,instance }
     public static ECurrentMenu currentMenu = ECurrentMenu.first;
@@ -50,7 +57,7 @@ public class MenuManager : MonoBehaviour
     // ----------- Instance Menu -------------
     public void NewRun() 
     {
-        SceneManager.LoadScene(1);
+        StartCoroutine(NewRunCoroutine());
     }
     public void InstanceMenuToFirstMenu()
     {
@@ -59,4 +66,12 @@ public class MenuManager : MonoBehaviour
         currentMenu = ECurrentMenu.first;
     }
     // ---------------------------------------
+
+    IEnumerator NewRunCoroutine() 
+    {
+        audioSource.PlayOneShot(newRunClip);
+        instanceMenu.SetActive(false);
+        yield return new WaitForSeconds(newRunClip.length);
+        SceneManager.LoadScene(1);
+    }
 }

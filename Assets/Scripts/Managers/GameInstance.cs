@@ -1,5 +1,5 @@
+using System;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Audio;
 
@@ -68,15 +68,16 @@ public class GameInstance : MonoBehaviour, IDataPersistence
     {
         if (PlayerPrefs.HasKey("MasterVolume")) 
         {
-            audioMixer.SetFloat("Master",PlayerPrefs.GetFloat("MasterVolume"));
+            Debug.Log("MasterVolume");
+            audioMixer.SetFloat("Master", MathF.Log10(PlayerPrefs.GetFloat("MasterVolume")) * 20f);
         }
         if (PlayerPrefs.HasKey("MusicVolume"))
         {
-            audioMixer.SetFloat("Music", PlayerPrefs.GetFloat("MusicVolume"));
+            audioMixer.SetFloat("Music", MathF.Log10(PlayerPrefs.GetFloat("MusicVolume")) * 20f);
         }
         if (PlayerPrefs.HasKey("SFXVolume"))
         {
-            audioMixer.SetFloat("SFX", PlayerPrefs.GetFloat("SFXVolume"));
+            audioMixer.SetFloat("SFX", MathF.Log10(PlayerPrefs.GetFloat("SFXVolume")) * 20f);
         }
     }
 

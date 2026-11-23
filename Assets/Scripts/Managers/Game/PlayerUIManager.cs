@@ -3,11 +3,11 @@ using UnityEngine.UI;
 
 public class PlayerUIManager : MonoBehaviour
 {
-    [SerializeField] private Image healthBar;
+    [SerializeField] private Slider healthBar;
 
     public void UpdateHealthBar(float maxHealth, float currentHealth)
     {
         float healthPercentage = currentHealth / maxHealth;
-        healthBar.fillAmount = healthPercentage;
+        healthBar.value = healthPercentage;
     }
 }

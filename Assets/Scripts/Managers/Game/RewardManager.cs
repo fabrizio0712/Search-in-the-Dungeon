@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -7,6 +8,7 @@ public class RewardManager : MonoBehaviour
     [Header("References")]
     [SerializeField] private GameManager gameManager;
     [SerializeField] private List<Transform> cardsTranformParents = new List<Transform>();
+    [SerializeField] private AudioSource audioSource;
     
     [Header("Cards Lists")]
     [SerializeField] private List<GameObject> commonCards = new List<GameObject>();
@@ -25,17 +27,24 @@ public class RewardManager : MonoBehaviour
 
     private void OnEnable()
     {
-        SetUpShop();   
+        audioSource.Play();
+        StartCoroutine(SetUpShop());  
     }
-    private void SetUpShop() 
+    private IEnumerator SetUpShop() 
     {
         currentEmbers = gameManager.CurrentActiveArtifact.ArtifactInfo.Value + gameManager.AditionalEmbers;
         UIEmbersUpdate();
+        yield return new WaitForSeconds(1);
         cardShopOptions[0].SetUpCardOption(Instantiate(GetRandomCard(commonCards), cardsTranformParents[0]));
+        yield return new WaitForSeconds(1);
         cardShopOptions[1].SetUpCardOption(Instantiate(GetRandomCard(commonCards), cardsTranformParents[1]));
+        yield return new WaitForSeconds(1);
         cardShopOptions[2].SetUpCardOption(Instantiate(GetRandomCard(rareCards), cardsTranformParents[2]));
+        yield return new WaitForSeconds(1);
         cardShopOptions[3].SetUpCardOption(Instantiate(GetRandomCard(rareCards), cardsTranformParents[3]));
+        yield return new WaitForSeconds(1);
         cardShopOptions[4].SetUpCardOption(Instantiate(GetRandomCard(superCards), cardsTranformParents[4]));
+
     }
     private GameObject GetRandomCard( List<GameObject> cardList) 
     {

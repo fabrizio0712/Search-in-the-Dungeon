@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.UI;
@@ -12,27 +13,24 @@ public class AudioSettings : MonoBehaviour
 
     private void Start()
     {
-        audioMixer.GetFloat("Master", out aux);
-        masterSlider.value = aux;
-        audioMixer.GetFloat("Music", out aux);
-        musicSlider.value = aux;
-        audioMixer.GetFloat("SFX", out aux);
-        sfxSlider.value = aux;
+        masterSlider.value = PlayerPrefs.GetFloat("MasterVolume");
+        musicSlider.value = PlayerPrefs.GetFloat("MusicVolume");
+        sfxSlider.value = PlayerPrefs.GetFloat("SFXVolume");
     }
 
     public void SetMasterVolume( float volume)
     {
-        audioMixer.SetFloat("Master", volume);
+        audioMixer.SetFloat("Master", MathF.Log10(volume) * 20f);
         PlayerPrefs.SetFloat("MasterVolume", volume);
     }
     public void SetMusicVolume(float volume) 
     {
-        audioMixer.SetFloat("Music", volume);
+        audioMixer.SetFloat("Music", MathF.Log10(volume) * 20f);
         PlayerPrefs.SetFloat("MusicVolume", volume);
     }
     public void SetSFXVolume(float volume)
     {
-        audioMixer.SetFloat("SFX", volume);
+        audioMixer.SetFloat("SFX", MathF.Log10(volume) * 20f);
         PlayerPrefs.SetFloat("SFXVolume", volume);
     }
 }

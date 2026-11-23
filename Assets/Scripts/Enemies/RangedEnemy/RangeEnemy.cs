@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -5,6 +6,8 @@ public class RangeEnemy : MonoBehaviour
 {
     // Components
     [SerializeField] private GameObject body;
+    [SerializeField] private Animator animController;
+    [SerializeField] private AudioSource audioSource;
     private FieldOfView fieldOfView;
 
     // Attack Elements
@@ -19,10 +22,6 @@ public class RangeEnemy : MonoBehaviour
     void Start()
     {
         fieldOfView = GetComponent<FieldOfView>();
-        /*GameObject firstPoolObject = Instantiate(projectile);
-        firstPoolObject.GetComponent<EnemyProjectile>().SetParent(body);
-        firstPoolObject.SetActive(false);
-        projectilePool.Add(firstPoolObject);*/
     }
 
     // Update is called once per frame
@@ -34,14 +33,13 @@ public class RangeEnemy : MonoBehaviour
             if (currentAttackTime < attackCooldown) currentAttackTime += Time.deltaTime;
             else
             {
-                Attack();
+                StartCoroutine(Attack());
                 currentAttackTime = 0;
             }
         }
         else
         {
             currentAttackTime = 0;
-            transform.RotateAroundLocal(Vector3.up, 5 * Time.deltaTime);
         }
     }
     private GameObject GetPoolObject() 
@@ -60,11 +58,15 @@ public class RangeEnemy : MonoBehaviour
         return newObjectInPool;
     }
 
-    private void Attack() 
+    private IEnumerator Attack() 
     {
+        animController.SetBool("Attaking", true);
+        yield return new WaitForSeconds(.5f);
         GameObject currentProjectile = GetPoolObject();
         currentProjectile.transform.position = body.transform.position;
         currentProjectile.transform.forward = body.transform.forward;
         currentProjectile.SetActive(true);
+        audioSource.Play();
+        animController.SetBool("Attaking", false);
     }
 }

@@ -17,6 +17,11 @@ public class RiskSensor : MonoBehaviour
     [SerializeField] private float detectionIntervalCurrentTime = 0;
     [SerializeField] private float cooldownCurrentTime = 0;
 
+    private AudioSource audioSource;
+    private void Start()
+    {
+        audioSource = GetComponent<AudioSource>();
+    }
     private void Update()
     {
         if (onCooldown) 
@@ -43,6 +48,7 @@ public class RiskSensor : MonoBehaviour
                 Collider[] temp = Physics.OverlapSphere(transform.position, detectionRange, playerSoundMask);
                 if (temp.Length > 0)
                 {
+                    audioSource.Play();
                     gameManager.RiskUpdate(1);
                     onCooldown = true;
                 }

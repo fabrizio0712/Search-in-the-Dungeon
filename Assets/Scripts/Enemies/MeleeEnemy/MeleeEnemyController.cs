@@ -9,6 +9,7 @@ public class MeleeEnemyController : MonoBehaviour
     [SerializeField] private NavMeshAgent agent;
     [SerializeField] private Collider attackCollider;
     [SerializeField] private AudioSource audio;
+    [SerializeField] private Animator animController;
 
     [Header("Patrol Variables")]
     [SerializeField] private float speedPatrol;
@@ -26,6 +27,7 @@ public class MeleeEnemyController : MonoBehaviour
     [SerializeField] private float attackDuration;
     private float currentCooldownTime;
     private float currentAttackDuration;
+    private bool damageDealt = false;
     
     // States
     [SerializeField] private EMeleeEnemyStates currentState;
@@ -75,25 +77,37 @@ public class MeleeEnemyController : MonoBehaviour
     }
     private void BehaviourAttak()
     {
-        if (!attackCollider.enabled) attackCollider.enabled = true;
         if (currentAttackDuration < attackDuration)
         {
+            animController.SetBool("Attaking", true);
+            if (currentAttackDuration > attackDuration * 0.2f && currentAttackDuration < attackDuration * 0.7f)
+            {
+                attackCollider.enabled = true;
+            }
+            else  
+            {
+                attackCollider.enabled = false;
+            }
             currentAttackDuration += Time.deltaTime;
         }
         else
         {
             currentCooldownTime = attackCooldown;
+            damageDealt = false;
             currentAttackDuration = 0;
             attackCollider.enabled = false;
+            animController.SetBool("Attaking", false);
             currentState = EMeleeEnemyStates.Patrol;
         }
     }
     private void BehaviourChase()
     {
+        animController.SetFloat("Speed", agent.velocity.magnitude);
+        animController.SetBool("Attaking", false);
         if (fov.HasVisualTarget)
         {
             agent.SetDestination(fov.VisibleTargets[0].transform.position);
-            if (agent.remainingDistance < agent.stoppingDistance)
+            if (Vector3.Distance(transform.position,fov.VisibleTargets[0].transform.position) <= agent.stoppingDistance)
             {
                 agent.velocity = Vector3.zero;
                 if (currentCooldownTime <= 0) currentState = EMeleeEnemyStates.Attaking;
@@ -111,6 +125,8 @@ public class MeleeEnemyController : MonoBehaviour
     }
     private void BehaviourPatrol() 
     {
+        animController.SetFloat("Speed", agent.velocity.magnitude);
+        animController.SetBool("Attaking", false);
         if (!fov.HasVisualTarget)
         {
             if (!agent.hasPath)
@@ -147,9 +163,10 @@ public class MeleeEnemyController : MonoBehaviour
     }
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player")) 
+        if (other.CompareTag("Player") && !damageDealt) 
         {
             other.gameObject.GetComponent<PlayerController>().GetDamage(attackDamage);
+            damageDealt = true;
         }
     }
 }

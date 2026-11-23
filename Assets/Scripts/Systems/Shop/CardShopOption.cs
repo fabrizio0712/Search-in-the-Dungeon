@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -9,12 +10,16 @@ public class CardShopOption : MonoBehaviour
     [SerializeField] private TextMeshProUGUI cardValue;
     [SerializeField] private GameObject greyOut;
     [SerializeField] private TextMeshProUGUI greyOutText;
+    [SerializeField] private AudioSource audioSource;
+    [SerializeField] private AudioClip spawnCardSound;
+    [SerializeField] private List<AudioClip> buyCardSounds;
     
     private GameObject cardGameObject;
     private CardLogic card;
 
     public void SetUpCardOption(GameObject GivedCard) 
     {
+        audioSource.PlayOneShot(spawnCardSound);
         cardGameObject = GivedCard;
         card = cardGameObject.GetComponent<CardLogic>();
         card.SetUpCard(false);
@@ -24,6 +29,7 @@ public class CardShopOption : MonoBehaviour
         {
             greyOut.SetActive(true);
             greyOutText.text = "Maxed Copies";
+            buyButton.interactable = false;
         }
     }
     public void CheckEnoughEmbers() 
@@ -43,5 +49,6 @@ public class CardShopOption : MonoBehaviour
         buyButton.interactable = false;
         greyOut.SetActive(true);
         greyOutText.text = "Sold";
+        audioSource.PlayOneShot(buyCardSounds[Random.Range(0, buyCardSounds.Count)]);
     }
 }

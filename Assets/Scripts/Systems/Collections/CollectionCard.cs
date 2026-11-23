@@ -2,7 +2,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class CollectionCard : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, IDragHandler, IEndDragHandler
+public class CollectionCard : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
     [SerializeField] private CardLogic card;
     [SerializeField] private int cardCount;
@@ -11,6 +11,8 @@ public class CollectionCard : MonoBehaviour, IPointerDownHandler, IBeginDragHand
     [SerializeField] private GameObject greyOut;
     [SerializeField] private CanvasGroup canvasGroup;
     [SerializeField] private bool canBeDrag;
+    [SerializeField] private AudioClip pickUpAudio;
+    [SerializeField] private AudioSource audioSource;
 
     private CardCollectionManager cardCollectionManager;
     public int CardCount { get => cardCount;}
@@ -59,13 +61,15 @@ public class CollectionCard : MonoBehaviour, IPointerDownHandler, IBeginDragHand
 
     public void OnPointerDown(PointerEventData eventData)
     {
+        audioSource.PlayOneShot(pickUpAudio);
+        card.gameObject.transform.SetParent(cardCollectionManager.gameObject.transform);
+        card.gameObject.transform.position = eventData.position;
+        canvasGroup.blocksRaycasts = false;
     }
 
     public void OnBeginDrag(PointerEventData eventData)
     {
-        card.gameObject.transform.SetParent(cardCollectionManager.gameObject.transform);
         card.gameObject.transform.position = eventData.position;
-        canvasGroup.blocksRaycasts = false;
     }
 
     public void OnDrag(PointerEventData eventData)
@@ -78,5 +82,13 @@ public class CollectionCard : MonoBehaviour, IPointerDownHandler, IBeginDragHand
         card.gameObject.transform.SetParent(cardSocket.transform);
         card.gameObject.transform.position = cardSocket.transform.position;
         SetCardCount(cardCount);
+    }
+
+    public void OnPointerUp(PointerEventData eventData)
+    {
+        card.gameObject.transform.SetParent(cardSocket.transform);
+        card.gameObject.transform.position = cardSocket.transform.position;
+        SetCardCount(cardCount);
+        audioSource.PlayOneShot(pickUpAudio);
     }
 }

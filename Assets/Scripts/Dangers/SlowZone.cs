@@ -4,9 +4,8 @@ public class SlowZone : MonoBehaviour
 {
     [SerializeField] private float slowDebuffMultiplier;
 
-    private void OnTriggerEnter(Collider other)
+    private void OnTriggerStay(Collider other)
     {
-        Debug.Log("trigger Enter");
         if(other.gameObject.tag == "Player") 
         {
             other.GetComponent<PlayerController>().DebuffSpeed = slowDebuffMultiplier;
@@ -14,7 +13,6 @@ public class SlowZone : MonoBehaviour
     }
     private void OnTriggerExit(Collider other)
     {
-        Debug.Log("trigger Exit");
         if (other.gameObject.tag == "Player")
         {
             other.GetComponent<PlayerController>().DebuffSpeed = 1;
